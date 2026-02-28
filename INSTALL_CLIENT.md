@@ -94,11 +94,16 @@ pip install -r requirements.txt
 
 ## Step 5 — Configure server address
 
-Copy the example config file:
+The `.env` file must be created inside the `client/` directory (next to `main.py`).
+
+Copy the example config file from within `client/`:
 
 ```bash
-# Windows
+# Windows (cmd)
 copy .env.example .env
+
+# Windows (PowerShell)
+Copy-Item .env.example .env
 
 # Linux/macOS
 cp .env.example .env
@@ -163,13 +168,19 @@ echo $DISPLAY
 3. After changing the password the main window opens with tabs: **Inbox**, **Send**, **Admin**
 4. Status bar at the bottom should show **"WS: connected"**
 
-## Session persistence
+## Session persistence and server switching
 
 After a successful login, the session token is saved to:
 - **Windows:** `C:\Users\<username>\.file_exchanger\session.json`
 - **Linux/macOS:** `~/.file_exchanger/session.json`
 
 On the next launch the client restores the session automatically — no login required.
+
+> **When switching servers:** the saved session token is bound to the server
+> it was issued by. If you change `FILE_EXCHANGER_HOST` in `.env` to point
+> to a different server, the old token will be rejected and the login dialog
+> will appear automatically. This is expected behaviour, not an error.
+> Simply log in with credentials valid on the new server.
 
 To force a fresh login, delete the session file:
 ```bash
@@ -200,6 +211,7 @@ rmdir /s /q "%USERPROFILE%\.file_exchanger"   # Windows
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
 | `python main.py` — `ModuleNotFoundError: PyQt6` | venv not activated or install failed | Activate venv and re-run `pip install -r requirements.txt` |
+| Login window appears after server change | Session token from old server is invalid | Expected — just log in with new server credentials |
 | Login window appears but login fails | Wrong server address | Check `client/.env`, verify with `curl` |
 | `WS: reconnecting…` in status bar | WebSocket can't connect | Check port 8000 is open on server; check `.env` address |
 | Blank window / no widgets visible | Missing Qt system libs on Linux | Re-run Step 2 system dependencies |

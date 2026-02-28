@@ -75,15 +75,11 @@ pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### Remote (Ubuntu 24, one command)
+### Remote (Ubuntu 24)
 
-SSH into the server and run:
-
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/buchgit/file-exchanger/master/server/deploy.sh)
-```
-
-The script installs dependencies, creates a systemd service, and opens port 8000.
+See **[INSTALL_SERVER.md](INSTALL_SERVER.md)** for the full step-by-step guide.
+A `server/deploy.sh` script is also provided but manual steps are recommended
+for reliable deployment in SSH environments.
 
 ### Verify
 
