@@ -149,6 +149,83 @@ All 34 tests should pass.
 
 ---
 
+## Deploying Server to a Remote Machine (Ubuntu 24)
+
+This section describes how to run the server on a public IP so clients
+can connect from the internet.
+
+### Automated deployment (one command)
+
+SSH into the server as root and run:
+
+```bash
+ssh root@151.236.10.160
+bash <(curl -fsSL https://raw.githubusercontent.com/buchgit/file-exchanger/master/server/deploy.sh)
+```
+
+The script will:
+1. Install Python 3, pip, git
+2. Clone the repository to `/opt/file-exchanger`
+3. Create a virtual environment and install dependencies
+4. Create a `storage/` directory for uploaded files
+5. Register and start a `systemd` service that auto-restarts on failure
+6. Open port 8000 in `ufw` firewall
+
+### Manual deployment
+
+```bash
+# 1. Install dependencies
+apt update && apt install -y python3 python3-pip python3-venv git
+
+# 2. Clone the repository
+git clone https://github.com/buchgit/file-exchanger.git /opt/file-exchanger
+cd /opt/file-exchanger
+
+# 3. Create virtual environment
+python3 -m venv venv
+venv/bin/pip install -r server/requirements.txt
+
+# 4. Create storage directory
+mkdir -p server/storage
+chown -R www-data:www-data /opt/file-exchanger
+
+# 5. Install and start systemd service
+cp server/file-exchanger.service /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable file-exchanger
+systemctl start file-exchanger
+
+# 6. Open firewall port
+ufw allow 8000/tcp
+```
+
+### Managing the service
+
+```bash
+systemctl status file-exchanger     # check status
+systemctl restart file-exchanger    # restart
+systemctl stop file-exchanger       # stop
+journalctl -u file-exchanger -f     # live logs
+```
+
+### Updating the server
+
+```bash
+ssh root@151.236.10.160
+cd /opt/file-exchanger
+git pull
+systemctl restart file-exchanger
+```
+
+### Verify it works
+
+```bash
+curl http://151.236.10.160:8000/health
+# Expected: {"status":"ok"}
+```
+
+---
+
 ## Client Installation
 
 ### Requirements
@@ -201,14 +278,32 @@ Dependencies installed:
 | requests | ≥ 2.32.0 | HTTP API calls |
 | websocket-client | ≥ 1.8.0 | WebSocket connection |
 
-### Step 6 — Configure server address (optional)
+### Step 6 — Configure server address
 
-By default the client connects to `http://localhost:8000`.
-To connect to a remote server, edit `client/config.py`:
+By default the client connects to `http://151.236.10.160:8000`.
 
+To override without editing the source, set an environment variable before running:
+
+**Windows (cmd):**
+```cmd
+set FILE_EXCHANGER_HOST=151.236.10.160:8000
+python main.py
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:FILE_EXCHANGER_HOST="151.236.10.160:8000"
+python main.py
+```
+
+**Linux/macOS:**
+```bash
+FILE_EXCHANGER_HOST=151.236.10.160:8000 python main.py
+```
+
+Or permanently edit `client/config.py`:
 ```python
-BASE_URL = "http://your-server-address:8000"
-WS_URL  = "ws://your-server-address:8000/ws"
+_SERVER_HOST = "151.236.10.160:8000"
 ```
 
 ### Step 7 — Run the client

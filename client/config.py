@@ -1,8 +1,10 @@
 import json
+import os
 from pathlib import Path
 
-BASE_URL = "http://localhost:8000"
-WS_URL = "ws://localhost:8000/ws"
+_SERVER_HOST = os.environ.get("FILE_EXCHANGER_HOST", "151.236.10.160:8000")
+BASE_URL = f"http://{_SERVER_HOST}"
+WS_URL   = f"ws://{_SERVER_HOST}/ws"
 
 SESSION_FILE = Path.home() / ".file_exchanger/session.json"
 
