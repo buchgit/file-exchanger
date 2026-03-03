@@ -165,6 +165,8 @@ class ApiClient:
                 headers=self._headers(token),
                 timeout=10,
             )
+            if resp.status_code == 204:
+                return
             self._raise_for_status(resp)
         except ApiError:
             raise

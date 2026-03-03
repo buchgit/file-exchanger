@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QCheckBox, QFormLayout, QGroupBox, QHBoxLayout,
     QLabel, QLineEdit, QMessageBox, QPushButton,
@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
 )
 
 from api import ApiClient, ApiError, ApiWorker
+from ui.glass_style import GLASS_STYLEHEET
 
 
 class AdminWidget(QWidget):
@@ -26,16 +27,20 @@ class AdminWidget(QWidget):
         self._token = token
         self._current_user_id = current_user_id
         self._workers: list[ApiWorker] = []
+        self.setStyleSheet(GLASS_STYLEHEET)
 
         self._build_ui()
         self._refresh_users()
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(20)
 
         # ---- Users group ----
-        users_group = QGroupBox("Users")
+        users_group = QGroupBox("👥 Users")
         users_vbox = QVBoxLayout(users_group)
+        users_vbox.setSpacing(12)
 
         self._table = QTableWidget(0, 6)
         self._table.setHorizontalHeaderLabels(
@@ -47,28 +52,32 @@ class AdminWidget(QWidget):
         self._table.horizontalHeader().setStretchLastSection(False)
         users_vbox.addWidget(self._table)
 
-        refresh_btn = QPushButton("Refresh")
+        refresh_btn = QPushButton("⟳ Refresh Users")
         refresh_btn.clicked.connect(self._refresh_users)
         users_vbox.addWidget(refresh_btn)
 
         layout.addWidget(users_group)
 
         # ---- Create User group ----
-        create_group = QGroupBox("Create User")
+        create_group = QGroupBox("✨ Create New User")
         create_form = QFormLayout(create_group)
+        create_form.setSpacing(12)
 
         self._new_username = QLineEdit()
+        self._new_username.setPlaceholderText("Enter username")
         self._new_password = QLineEdit()
         self._new_password.setEchoMode(QLineEdit.EchoMode.Password)
-        self._is_admin_check = QCheckBox("Admin")
+        self._new_password.setPlaceholderText("Enter password")
+        self._is_admin_check = QCheckBox("Grant admin privileges")
 
         create_form.addRow("Username:", self._new_username)
         create_form.addRow("Password:", self._new_password)
         create_form.addRow("", self._is_admin_check)
 
-        self._create_btn = QPushButton("Create")
+        self._create_btn = QPushButton("✨ Create User")
         self._create_btn.clicked.connect(self._on_create_clicked)
         self._create_status = QLabel("")
+        self._create_status.setObjectName("statusLabel")
         self._create_status.setWordWrap(True)
 
         create_form.addRow(self._create_btn)

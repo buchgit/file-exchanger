@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import os
 
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import (
     QComboBox, QFileDialog, QFormLayout, QHBoxLayout,
     QLabel, QLineEdit, QMessageBox, QProgressBar,
@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
 )
 
 from api import ApiClient, ApiError, ApiWorker
+from ui.glass_style import GLASS_STYLEHEET
 
 
 class UploadWorker(QThread):
@@ -69,6 +70,7 @@ class SendWidget(QWidget):
         self._workers: list = []
         self._upload_workers: list[UploadWorker] = []
         self._selected_file: str | None = None
+        self.setStyleSheet(GLASS_STYLEHEET)
 
         self._build_ui()
         self._load_users()
@@ -79,16 +81,24 @@ class SendWidget(QWidget):
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(16)
+
+        # Title
+        title = QLabel("📤 Send File")
+        title.setStyleSheet("font-size: 18px; font-weight: 600;")
+        layout.addWidget(title)
 
         # To: combobox + refresh
         self._receiver_combo = QComboBox()
-        self._refresh_users_btn = QPushButton("↻")
-        self._refresh_users_btn.setFixedWidth(28)
+        self._refresh_users_btn = QPushButton("⟳")
+        self._refresh_users_btn.setFixedWidth(36)
         self._refresh_users_btn.setToolTip("Refresh user list")
         self._refresh_users_btn.clicked.connect(self._load_users)
         to_row = QWidget(self)
         to_layout = QHBoxLayout(to_row)
         to_layout.setContentsMargins(0, 0, 0, 0)
+        to_layout.setSpacing(8)
         to_layout.addWidget(self._receiver_combo)
         to_layout.addWidget(self._refresh_users_btn)
 
@@ -96,11 +106,12 @@ class SendWidget(QWidget):
         self._file_edit = QLineEdit()
         self._file_edit.setReadOnly(True)
         self._file_edit.setPlaceholderText("No file selected")
-        self._browse_btn = QPushButton("Browse…")
+        self._browse_btn = QPushButton("📁 Browse")
         self._browse_btn.clicked.connect(self._on_browse)
         file_row = QWidget(self)
         file_layout = QHBoxLayout(file_row)
         file_layout.setContentsMargins(0, 0, 0, 0)
+        file_layout.setSpacing(8)
         file_layout.addWidget(self._file_edit)
         file_layout.addWidget(self._browse_btn)
 
@@ -116,6 +127,7 @@ class SendWidget(QWidget):
         part_row = QWidget(self)
         part_layout = QHBoxLayout(part_row)
         part_layout.setContentsMargins(0, 0, 0, 0)
+        part_layout.setSpacing(8)
         part_layout.addWidget(self._part_spin)
         part_layout.addWidget(QLabel("of"))
         part_layout.addWidget(self._total_spin)
@@ -127,12 +139,14 @@ class SendWidget(QWidget):
         self._comment_edit.setPlaceholderText("Optional comment…")
 
         # Send button + progress + status
-        self._send_btn = QPushButton("Send")
+        self._send_btn = QPushButton("📤 Send File")
         self._send_btn.clicked.connect(self._on_send)
         self._progress = QProgressBar()
         self._progress.setVisible(False)
         self._file_size_label = QLabel("")
+        self._file_size_label.setObjectName("statusLabel")
         self._status_label = QLabel("")
+        self._status_label.setObjectName("statusLabel")
 
         layout.addWidget(QLabel("To:"))
         layout.addWidget(to_row)

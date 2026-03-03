@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit,
     QPushButton, QStackedWidget, QVBoxLayout, QWidget,
 )
 
 from api import ApiClient, ApiError, ApiWorker
+from ui.glass_style import GLASS_STYLEHEET
 
 
 class LoginDialog(QDialog):
@@ -19,13 +20,17 @@ class LoginDialog(QDialog):
         self._token: str | None = None
 
         self.setWindowTitle("File Exchanger — Login")
-        self.setMinimumWidth(360)
+        self.setMinimumWidth(420)
+        self.setMinimumHeight(500)
+        self.setStyleSheet(GLASS_STYLEHEET)
 
         self._stack = QStackedWidget()
         self._stack.addWidget(self._build_login_page())
         self._stack.addWidget(self._build_change_pw_page())
 
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(20)
         layout.addWidget(self._stack)
         self.setLayout(layout)
 
@@ -36,10 +41,23 @@ class LoginDialog(QDialog):
     def _build_login_page(self) -> QWidget:
         page = QWidget()
         vbox = QVBoxLayout(page)
+        vbox.setContentsMargins(0, 0, 0, 0)
+        vbox.setSpacing(16)
+
+        # Title
+        title = QLabel("🔐 File Exchanger")
+        title.setObjectName("titleLabel")
+        title.setAlignment(Qt.AlignCenter)
+        
+        subtitle = QLabel("Sign in to your account")
+        subtitle.setObjectName("subtitleLabel")
+        subtitle.setAlignment(Qt.AlignCenter)
 
         self._username_edit = QLineEdit()
+        self._username_edit.setPlaceholderText("Enter your username")
         self._password_edit = QLineEdit()
         self._password_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self._password_edit.setPlaceholderText("Enter your password")
 
         self._login_btn = QPushButton("Log In")
         self._login_btn.setDefault(True)
@@ -48,13 +66,18 @@ class LoginDialog(QDialog):
         self._password_edit.returnPressed.connect(self._on_login_clicked)
 
         self._status_label = QLabel("")
-        self._status_label.setStyleSheet("color: red;")
+        self._status_label.setStyleSheet("color: #ff6b6b; font-size: 13px;")
         self._status_label.setWordWrap(True)
+        self._status_label.setAlignment(Qt.AlignCenter)
 
+        vbox.addWidget(title)
+        vbox.addWidget(subtitle)
+        vbox.addSpacing(20)
         vbox.addWidget(QLabel("Username:"))
         vbox.addWidget(self._username_edit)
         vbox.addWidget(QLabel("Password:"))
         vbox.addWidget(self._password_edit)
+        vbox.addSpacing(10)
         vbox.addWidget(self._login_btn)
         vbox.addWidget(self._status_label)
         vbox.addStretch()
@@ -62,39 +85,58 @@ class LoginDialog(QDialog):
 
     def _build_change_pw_page(self) -> QWidget:
         page = QWidget()
+        vbox = QVBoxLayout(page)
+        vbox.setContentsMargins(0, 0, 0, 0)
+        vbox.setSpacing(16)
 
+        # Title
+        title = QLabel("🔑 Change Password")
+        title.setObjectName("titleLabel")
+        title.setAlignment(Qt.AlignCenter)
+        
         info = QLabel("Your password must be changed before continuing.")
+        info.setObjectName("subtitleLabel")
         info.setWordWrap(True)
+        info.setAlignment(Qt.AlignCenter)
 
-        form = QFormLayout()
+        form_layout = QVBoxLayout()
+        form_layout.setSpacing(12)
+        
         self._current_password_edit = QLineEdit()
         self._current_password_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self._current_password_edit.setPlaceholderText("Enter current password")
+        
         self._new_password_edit = QLineEdit()
         self._new_password_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self._new_password_edit.setPlaceholderText("Enter new password")
+        
         self._confirm_password_edit = QLineEdit()
         self._confirm_password_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self._confirm_password_edit.setPlaceholderText("Confirm new password")
 
-        form.addRow("Current password:", self._current_password_edit)
-        form.addRow("New password:", self._new_password_edit)
-        form.addRow("Confirm password:", self._confirm_password_edit)
+        form_layout.addWidget(QLabel("Current Password:"))
+        form_layout.addWidget(self._current_password_edit)
+        form_layout.addWidget(QLabel("New Password:"))
+        form_layout.addWidget(self._new_password_edit)
+        form_layout.addWidget(QLabel("Confirm Password:"))
+        form_layout.addWidget(self._confirm_password_edit)
 
         self._change_btn = QPushButton("Change Password")
         self._change_btn.clicked.connect(self._on_change_clicked)
         self._confirm_password_edit.returnPressed.connect(self._on_change_clicked)
 
         self._pw_status_label = QLabel("")
-        self._pw_status_label.setStyleSheet("color: red;")
+        self._pw_status_label.setStyleSheet("color: #ff6b6b; font-size: 13px;")
         self._pw_status_label.setWordWrap(True)
+        self._pw_status_label.setAlignment(Qt.AlignCenter)
 
-        btn_row = QHBoxLayout()
-        btn_row.addStretch()
-        btn_row.addWidget(self._change_btn)
-
-        vbox = QVBoxLayout(page)
+        vbox.addWidget(title)
         vbox.addWidget(info)
-        vbox.addLayout(form)
-        vbox.addLayout(btn_row)
+        vbox.addSpacing(10)
+        vbox.addLayout(form_layout)
+        vbox.addWidget(self._change_btn)
         vbox.addWidget(self._pw_status_label)
+        vbox.addStretch()
         return page
 
     # ------------------------------------------------------------------

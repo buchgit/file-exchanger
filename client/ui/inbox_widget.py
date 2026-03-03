@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import (
     QFileDialog, QHBoxLayout, QLabel, QMessageBox,
     QProgressBar, QPushButton, QTableWidget, QTableWidgetItem,
@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
 )
 
 from api import ApiClient, ApiError, ApiWorker
+from ui.glass_style import GLASS_STYLEHEET
 
 
 class DownloadWorker(QThread):
@@ -58,6 +59,7 @@ class InboxWidget(QWidget):
         self._token = token
         self._workers: list = []
         self._download_workers: list[DownloadWorker] = []
+        self.setStyleSheet(GLASS_STYLEHEET)
 
         self._build_ui()
         self._refresh()
@@ -65,8 +67,9 @@ class InboxWidget(QWidget):
     def _build_ui(self) -> None:
         # Top bar
         top = QHBoxLayout()
-        title = QLabel("<b>Inbox — Pending Files</b>")
-        self._refresh_btn = QPushButton("Refresh")
+        title = QLabel("📥 Inbox — Pending Files")
+        title.setStyleSheet("font-size: 18px; font-weight: 600;")
+        self._refresh_btn = QPushButton("⟳ Refresh")
         self._refresh_btn.clicked.connect(self._refresh)
         top.addWidget(title)
         top.addStretch()
@@ -86,8 +89,11 @@ class InboxWidget(QWidget):
         self._download_progress = QProgressBar()
         self._download_progress.setVisible(False)
         self._status_label = QLabel("")
+        self._status_label.setObjectName("statusLabel")
 
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(16)
         layout.addLayout(top)
         layout.addWidget(self._table)
         layout.addWidget(self._download_progress)

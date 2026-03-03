@@ -85,5 +85,12 @@ def delete_user(
     user = db.get(User, user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    # Delete associated files (both sent and received)
+    from models import PendingFile
+    db.query(PendingFile).filter(
+        (PendingFile.sender_id == user_id) | (PendingFile.receiver_id == user_id)
+    ).delete(synchronize_session=False)
+    
     db.delete(user)
     db.commit()

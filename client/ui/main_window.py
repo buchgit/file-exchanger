@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit,
     QMainWindow, QMenuBar, QMessageBox, QPushButton,
@@ -13,6 +13,7 @@ from ui.inbox_widget import InboxWidget
 from ui.send_widget import SendWidget
 from ui.admin_widget import AdminWidget
 from ws_thread import WsThread
+from ui.glass_style import GLASS_STYLEHEET
 
 
 class MainWindow(QMainWindow):
@@ -27,7 +28,8 @@ class MainWindow(QMainWindow):
         self._workers: list[ApiWorker] = []
 
         self.setWindowTitle(f"File Exchanger — {user_info['username']}")
-        self.setMinimumSize(800, 500)
+        self.setMinimumSize(1000, 650)
+        self.setStyleSheet(GLASS_STYLEHEET)
 
         self._build_ui()
         self._build_menu()
@@ -151,22 +153,34 @@ class _ChangePasswordDialog(QDialog):
         self._workers: list = []
 
         self.setWindowTitle("Change Password")
-        self.setMinimumWidth(320)
+        self.setMinimumWidth(400)
+        self.setMinimumHeight(350)
+        self.setStyleSheet(GLASS_STYLEHEET)
+
+        # Title
+        title = QLabel("🔑 Change Password")
+        title.setObjectName("titleLabel")
+        title.setAlignment(Qt.AlignCenter)
 
         form = QFormLayout()
+        form.setSpacing(12)
         self._current = QLineEdit()
         self._current.setEchoMode(QLineEdit.EchoMode.Password)
+        self._current.setPlaceholderText("Enter current password")
         self._new_pw = QLineEdit()
         self._new_pw.setEchoMode(QLineEdit.EchoMode.Password)
+        self._new_pw.setPlaceholderText("Enter new password")
         self._confirm = QLineEdit()
         self._confirm.setEchoMode(QLineEdit.EchoMode.Password)
+        self._confirm.setPlaceholderText("Confirm new password")
         form.addRow("Current:", self._current)
         form.addRow("New:", self._new_pw)
         form.addRow("Confirm:", self._confirm)
 
-        self._btn = QPushButton("Change")
+        self._btn = QPushButton("Change Password")
         self._btn.clicked.connect(self._on_change)
         self._status = QLabel("")
+        self._status.setObjectName("statusLabel")
         self._status.setWordWrap(True)
 
         btn_row = QHBoxLayout()
@@ -174,6 +188,9 @@ class _ChangePasswordDialog(QDialog):
         btn_row.addWidget(self._btn)
 
         vbox = QVBoxLayout(self)
+        vbox.setContentsMargins(30, 30, 30, 30)
+        vbox.setSpacing(16)
+        vbox.addWidget(title)
         vbox.addLayout(form)
         vbox.addLayout(btn_row)
         vbox.addWidget(self._status)
