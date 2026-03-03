@@ -112,9 +112,9 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 ```
-
-``` blanktext
-cd D:\_projects_\file-exchanger\client
+- 
+``` bash
+cd ...\client
 .\venv\Scripts\activate
 python main.py
 
