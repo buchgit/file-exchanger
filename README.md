@@ -114,6 +114,7 @@ pip install -r requirements.txt
 ```
 - 
 ``` bash
+# Windows
 cd ...\client
 .\venv\Scripts\activate
 python main.py
