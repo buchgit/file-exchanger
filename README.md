@@ -113,6 +113,15 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+``` blanktext
+cd D:\_projects_\file-exchanger\client
+.\venv\Scripts\activate
+python main.py
+
+Для релогина
+Remove-Item "$env:USERPROFILE\.file_exchanger\session.json" -ErrorAction SilentlyContinue
+```
+
 ### Configure server address
 
 ```bash
