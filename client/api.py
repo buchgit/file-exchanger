@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 import requests
 from PyQt6.QtCore import QThread, pyqtSignal
@@ -36,8 +36,8 @@ class UserOut:
     id: int
     username: str
     is_admin: bool
-    force_change_password: bool
-    created_at: str
+    force_change_password: bool = False
+    created_at: str = ""
 
 
 @dataclass
@@ -49,9 +49,9 @@ class FileOut:
     stored_filename: str
     part_number: int
     total_parts: int
-    comment: str
-    status: str
-    created_at: str
+    comment: str = ""
+    status: str = "pending"
+    created_at: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -61,6 +61,29 @@ class FileOut:
 class ApiClient:
     def __init__(self, base_url: str = BASE_URL):
         self._base_url = base_url
+
+    def _to_user_out(self, payload: dict[str, Any]) -> UserOut:
+        return UserOut(
+            id=int(payload.get("id", 0)),
+            username=str(payload.get("username", "")),
+            is_admin=bool(payload.get("is_admin", False)),
+            force_change_password=bool(payload.get("force_change_password", False)),
+            created_at=str(payload.get("created_at", "")),
+        )
+
+    def _to_file_out(self, payload: dict[str, Any]) -> FileOut:
+        return FileOut(
+            id=int(payload.get("id", 0)),
+            sender_id=int(payload.get("sender_id", 0)),
+            receiver_id=int(payload.get("receiver_id", 0)),
+            original_filename=str(payload.get("original_filename", "")),
+            stored_filename=str(payload.get("stored_filename", "")),
+            part_number=int(payload.get("part_number", 1)),
+            total_parts=int(payload.get("total_parts", 1)),
+            comment=str(payload.get("comment", "")),
+            status=str(payload.get("status", "pending")),
+            created_at=str(payload.get("created_at", "")),
+        )
 
     def _headers(self, token: str) -> dict:
         return {"Authorization": f"Bearer {token}"}
@@ -123,7 +146,10 @@ class ApiClient:
                 timeout=10,
             )
             self._raise_for_status(resp)
-            return [UserOut(**u) for u in resp.json()]
+            data = resp.json()
+            if not isinstance(data, list):
+                raise ApiError(resp.status_code, "Unexpected users response format")
+            return [self._to_user_out(u) for u in data if isinstance(u, dict)]
         except ApiError:
             raise
         except requests.RequestException as exc:
@@ -137,7 +163,10 @@ class ApiClient:
                 timeout=10,
             )
             self._raise_for_status(resp)
-            return UserOut(**resp.json())
+            data = resp.json()
+            if not isinstance(data, dict):
+                raise ApiError(resp.status_code, "Unexpected user response format")
+            return self._to_user_out(data)
         except ApiError:
             raise
         except requests.RequestException as exc:
@@ -152,7 +181,10 @@ class ApiClient:
                 timeout=10,
             )
             self._raise_for_status(resp)
-            return UserOut(**resp.json())
+            data = resp.json()
+            if not isinstance(data, dict):
+                raise ApiError(resp.status_code, "Unexpected create-user response format")
+            return self._to_user_out(data)
         except ApiError:
             raise
         except requests.RequestException as exc:
@@ -185,7 +217,10 @@ class ApiClient:
                 timeout=10,
             )
             self._raise_for_status(resp)
-            return [FileOut(**f) for f in resp.json()]
+            data = resp.json()
+            if not isinstance(data, list):
+                raise ApiError(resp.status_code, "Unexpected files response format")
+            return [self._to_file_out(f) for f in data if isinstance(f, dict)]
         except ApiError:
             raise
         except requests.RequestException as exc:
@@ -221,7 +256,10 @@ class ApiClient:
                 import os
                 progress_callback(os.path.getsize(file_path))
             self._raise_for_status(resp)
-            return FileOut(**resp.json())
+            data = resp.json()
+            if not isinstance(data, dict):
+                raise ApiError(resp.status_code, "Unexpected upload response format")
+            return self._to_file_out(data)
         except ApiError:
             raise
         except requests.RequestException as exc:

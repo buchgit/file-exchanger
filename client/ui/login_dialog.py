@@ -2,11 +2,17 @@ from __future__ import annotations
 
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
-    QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit,
-    QPushButton, QStackedWidget, QVBoxLayout, QWidget,
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QStackedWidget,
+    QVBoxLayout,
+    QWidget,
 )
 
-from api import ApiClient, ApiError, ApiWorker
+import config
+from api import ApiClient, ApiWorker
 from ui.glass_style import GLASS_STYLEHEET
 
 
@@ -19,9 +25,9 @@ class LoginDialog(QDialog):
         self._workers: list[ApiWorker] = []
         self._token: str | None = None
 
-        self.setWindowTitle("File Exchanger — Login")
+        self.setWindowTitle("File Exchanger - Login")
         self.setMinimumWidth(420)
-        self.setMinimumHeight(500)
+        self.setMinimumHeight(520)
         self.setStyleSheet(GLASS_STYLEHEET)
 
         self._stack = QStackedWidget()
@@ -44,14 +50,17 @@ class LoginDialog(QDialog):
         vbox.setContentsMargins(0, 0, 0, 0)
         vbox.setSpacing(16)
 
-        # Title
-        title = QLabel("🔐 File Exchanger")
+        title = QLabel("File Exchanger")
         title.setObjectName("titleLabel")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         subtitle = QLabel("Sign in to your account")
         subtitle.setObjectName("subtitleLabel")
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        server_host = QLabel(f"Server: {config.SERVER_HOST}")
+        server_host.setObjectName("statusLabel")
+        server_host.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self._username_edit = QLineEdit()
         self._username_edit.setPlaceholderText("Enter your username")
@@ -68,12 +77,13 @@ class LoginDialog(QDialog):
         self._password_edit.returnPressed.connect(self._on_login_clicked)
 
         self._status_label = QLabel("")
-        self._status_label.setStyleSheet("color: #ff6b6b; font-size: 13px;")
+        self._status_label.setStyleSheet("color: #ef4444; font-size: 13px;")
         self._status_label.setWordWrap(True)
         self._status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         vbox.addWidget(title)
         vbox.addWidget(subtitle)
+        vbox.addWidget(server_host)
         vbox.addSpacing(20)
         vbox.addWidget(QLabel("Username:"))
         vbox.addWidget(self._username_edit)
@@ -91,8 +101,7 @@ class LoginDialog(QDialog):
         vbox.setContentsMargins(0, 0, 0, 0)
         vbox.setSpacing(16)
 
-        # Title
-        title = QLabel("🔑 Change Password")
+        title = QLabel("Change Password")
         title.setObjectName("titleLabel")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -103,15 +112,15 @@ class LoginDialog(QDialog):
 
         form_layout = QVBoxLayout()
         form_layout.setSpacing(12)
-        
+
         self._current_password_edit = QLineEdit()
         self._current_password_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self._current_password_edit.setPlaceholderText("Enter current password")
-        
+
         self._new_password_edit = QLineEdit()
         self._new_password_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self._new_password_edit.setPlaceholderText("Enter new password")
-        
+
         self._confirm_password_edit = QLineEdit()
         self._confirm_password_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self._confirm_password_edit.setPlaceholderText("Confirm new password")
@@ -130,7 +139,7 @@ class LoginDialog(QDialog):
         self._confirm_password_edit.returnPressed.connect(self._on_change_clicked)
 
         self._pw_status_label = QLabel("")
-        self._pw_status_label.setStyleSheet("color: #ff6b6b; font-size: 13px;")
+        self._pw_status_label.setStyleSheet("color: #ef4444; font-size: 13px;")
         self._pw_status_label.setWordWrap(True)
         self._pw_status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -148,10 +157,12 @@ class LoginDialog(QDialog):
     # ------------------------------------------------------------------
 
     def _run_worker(self, fn, *args) -> ApiWorker:
-        w = ApiWorker(fn, *args)
-        self._workers.append(w)
-        w.finished.connect(lambda: self._workers.remove(w) if w in self._workers else None)
-        return w
+        worker = ApiWorker(fn, *args)
+        self._workers.append(worker)
+        worker.finished.connect(
+            lambda: self._workers.remove(worker) if worker in self._workers else None
+        )
+        return worker
 
     # ------------------------------------------------------------------
     # Login page slots
@@ -165,12 +176,12 @@ class LoginDialog(QDialog):
             return
 
         self._set_login_enabled(False)
-        self._status_label.setText("Logging in…")
+        self._status_label.setText("Logging in...")
 
-        w = self._run_worker(self._api.login, username, password)
-        w.result.connect(self._on_login_result)
-        w.error.connect(self._on_login_error)
-        w.start()
+        worker = self._run_worker(self._api.login, username, password)
+        worker.result.connect(self._on_login_result)
+        worker.error.connect(self._on_login_error)
+        worker.start()
 
     def _set_login_enabled(self, enabled: bool) -> None:
         self._username_edit.setEnabled(enabled)
@@ -186,14 +197,16 @@ class LoginDialog(QDialog):
             self._set_login_enabled(True)
             self._stack.setCurrentIndex(1)
         else:
-            # We need user info — emit with placeholder; main.py will call get_user
+            # Emit placeholder user info; main.py resolves full profile.
             user_info = {"id": None, "username": username, "is_admin": False}
             self.login_successful.emit(self._token, user_info)
             self.accept()
 
     def _on_login_error(self, code: int, detail: str) -> None:
         self._set_login_enabled(True)
-        self._status_label.setText(f"Error {code}: {detail}" if code else f"Network error: {detail}")
+        self._status_label.setText(
+            f"Error {code}: {detail}" if code else f"Network error: {detail}"
+        )
 
     # ------------------------------------------------------------------
     # Change-password page slots
@@ -212,12 +225,12 @@ class LoginDialog(QDialog):
             return
 
         self._change_btn.setEnabled(False)
-        self._pw_status_label.setText("Changing password…")
+        self._pw_status_label.setText("Changing password...")
 
-        w = self._run_worker(self._api.change_password, self._token, current, new_pw)
-        w.result.connect(self._on_change_result)
-        w.error.connect(self._on_change_error)
-        w.start()
+        worker = self._run_worker(self._api.change_password, self._token, current, new_pw)
+        worker.result.connect(self._on_change_result)
+        worker.error.connect(self._on_change_error)
+        worker.start()
 
     def _on_change_result(self, _) -> None:
         username = self._username_edit.text().strip()
@@ -227,4 +240,6 @@ class LoginDialog(QDialog):
 
     def _on_change_error(self, code: int, detail: str) -> None:
         self._change_btn.setEnabled(True)
-        self._pw_status_label.setText(f"Error {code}: {detail}" if code else f"Network error: {detail}")
+        self._pw_status_label.setText(
+            f"Error {code}: {detail}" if code else f"Network error: {detail}"
+        )

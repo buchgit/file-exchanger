@@ -1,10 +1,19 @@
+"""
+File Exchanger - Modern UI Launcher
+
+This launcher uses the new modern card-based interface design
+instead of the default glassmorphism style.
+
+Usage:
+    python main_modern.py
+"""
+
 from __future__ import annotations
 
 import sys
-import traceback
 from pathlib import Path
 
-# Ensure the client directory is on sys.path so sibling imports work
+# Ensure the client directory is on sys.path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from PyQt6.QtWidgets import QApplication, QMessageBox
@@ -12,24 +21,7 @@ from PyQt6.QtWidgets import QApplication, QMessageBox
 import config
 from api import ApiClient
 from ui.login_dialog import LoginDialog
-from ui.main_window import MainWindow
-
-
-def _write_crash_log(exc: BaseException) -> Path | None:
-    """Persist unexpected startup/runtime errors for packaged EXE diagnostics."""
-    try:
-        log_dir = Path.home() / ".file_exchanger"
-        log_dir.mkdir(parents=True, exist_ok=True)
-        log_file = log_dir / "client_crash.log"
-        with log_file.open("a", encoding="utf-8") as fh:
-            fh.write("\n=== FileExchanger crash ===\n")
-            fh.write("Python executable: " + sys.executable + "\n")
-            fh.write("Working directory: " + str(Path.cwd()) + "\n")
-            fh.write("Traceback:\n")
-            fh.write("".join(traceback.format_exception(type(exc), exc, exc.__traceback__)))
-        return log_file
-    except Exception:
-        return None
+from ui.modern_main_window import MainWindow
 
 
 def _show_server_config_error() -> None:
@@ -42,6 +34,7 @@ def _show_server_config_error() -> None:
 
 def main() -> None:
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")  # Clean modern look
 
     if not config.server_is_configured():
         _show_server_config_error()
@@ -75,8 +68,6 @@ def main() -> None:
         token, user_info = _do_login(api)
         if token is None:
             sys.exit(0)
-        # If user_info has no id yet (login dialog only has username),
-        # fetch proper user info now
         user_info = _resolve_user_info(api, token, user_info)
         config.save_session(
             token,
@@ -97,7 +88,9 @@ def _do_login(api: ApiClient) -> tuple[str | None, dict | None]:
     result: dict = {}
 
     dialog = LoginDialog(api)
-    dialog.login_successful.connect(lambda t, u: result.update(token=t, user=u))
+    dialog.login_successful.connect(
+        lambda t, u: result.update(token=t, user=u)
+    )
     if not dialog.exec() or not result:
         return None, None
     return result["token"], result["user"]
@@ -108,10 +101,8 @@ def _resolve_user_info(api: ApiClient, token: str, user_info: dict) -> dict:
     if user_info.get("id") is not None:
         return user_info
 
-    # Try /users/me first.
     try:
         import requests
-
         resp = requests.get(
             f"{config.BASE_URL}/users/me",
             headers={"Authorization": f"Bearer {token}"},
@@ -148,17 +139,14 @@ def _resolve_user_info(api: ApiClient, token: str, user_info: dict) -> dict:
     except Exception:
         pass
 
-    # Last fallback: typed client list.
     try:
-        for user in api.list_users(token):
-            if user.username == user_info.get("username"):
-                return {
-                    "id": user.id,
-                    "username": user.username,
-                    "is_admin": user.is_admin,
-                }
+        users = api.list_users(token)
+        for u in users:
+            if u.username == user_info.get("username"):
+                return {"id": u.id, "username": u.username, "is_admin": u.is_admin}
     except Exception:
         pass
+
     return user_info
 
 
@@ -185,8 +173,4 @@ def _show_main(app: QApplication, api: ApiClient, token: str, user_info: dict) -
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as exc:
-        _write_crash_log(exc)
-        raise
+    main()

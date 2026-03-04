@@ -5,7 +5,6 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('.env', '.'),
         ('ui', 'ui'),
     ],
     hiddenimports=[
