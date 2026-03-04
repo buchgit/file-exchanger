@@ -141,7 +141,9 @@ FILE_EXCHANGER_HOST=<SERVER_IP>:8000
 The `.env` file is gitignored. Priority order (highest to lowest):
 1. `FILE_EXCHANGER_HOST` environment variable
 2. `FILE_EXCHANGER_HOST` in `client/.env`
-3. Default: `localhost:8000`
+3. Optional pair: `FILE_EXCHANGER_SERVER_IP` + `FILE_EXCHANGER_SERVER_PORT`
+
+If no server address is configured, the client shows an error and exits.
 
 ### Run
 

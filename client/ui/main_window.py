@@ -138,10 +138,13 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _handle_401(self) -> None:
-        self._stop_ws()
-        config.clear_session()
-        self.hide()
-        self.logout_requested.emit()
+        self._ws_status_label.setText("● authorization error")
+        self._ws_status_label.setStyleSheet("color: #E84C3D; font-size: 12px;")
+        QMessageBox.warning(
+            self,
+            "Authorization",
+            "Session expired. Re-login via File -> Log Out.",
+        )
 
     # ------------------------------------------------------------------
     # Close event

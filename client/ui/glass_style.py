@@ -87,7 +87,8 @@ QPushButton {{
     background: {BG_CARD};
     border: 1px solid {BORDER};
     border-radius: 6px;
-    padding: 6px 16px;
+    padding: 7px 16px;
+    min-height: 34px;
     font-weight: 600;
     font-size: 13px;
     color: {TEXT};
@@ -117,7 +118,8 @@ QPushButton#primaryBtn {{
     color: {BG_APP};
     font-weight: 700;
     font-size: 14px;
-    padding: 8px 24px;
+    padding: 9px 24px;
+    min-height: 36px;
     border-radius: 8px;
 }}
 
@@ -186,9 +188,10 @@ QPushButton#accentBtn:hover {{
 /* Table cell buttons — tighter padding */
 QTableWidget QPushButton {{
     padding: 5px 10px;
+    min-height: 30px;
     font-size: 12px;
     border-radius: 5px;
-    margin: 3px 4px;
+    margin: 2px 4px;
 }}
 
 /* ═══════════════════════════════════════════

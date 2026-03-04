@@ -53,7 +53,7 @@ Skip this step on Windows and macOS.
 ## Step 3 — Create Python virtual environment
 
 ```bash
-cd file-exchanger/client
+cd client
 
 # Windows
 python -m venv venv
@@ -125,7 +125,9 @@ The `.env` file is gitignored and will not be committed to the repository.
 Priority order for server address (highest to lowest):
 1. `FILE_EXCHANGER_HOST` environment variable
 2. `FILE_EXCHANGER_HOST` value in `client/.env`
-3. Default: `localhost:8000`
+3. Optional pair: `FILE_EXCHANGER_SERVER_IP` + `FILE_EXCHANGER_SERVER_PORT`
+
+If no server address is configured, the client shows an error and exits.
 
 ## Step 6 — Verify server connectivity
 
@@ -186,6 +188,7 @@ To force a fresh login, delete the session file:
 ```bash
 # Windows
 del "%USERPROFILE%\.file_exchanger\session.json"
+Remove-Item "$env:USERPROFILE\.file_exchanger\session.json" -ErrorAction SilentlyContinue
 
 # Linux/macOS
 rm ~/.file_exchanger/session.json
@@ -211,8 +214,12 @@ rmdir /s /q "%USERPROFILE%\.file_exchanger"   # Windows
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
 | `python main.py` — `ModuleNotFoundError: PyQt6` | venv not activated or install failed | Activate venv and re-run `pip install -r requirements.txt` |
+| `venv\Scripts\activate` is blocked in PowerShell | Execution policy blocks local scripts | Run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`, then activate venv again |
+| `.env.example` not found | Wrong current directory | `cd file-exchanger/client` and re-run copy command |
+| `pip install -r requirements.txt` times out | Slow/unstable network or old pip | `pip install --upgrade pip` and retry with `pip install --default-timeout=120 -r requirements.txt` |
 | Login window appears after server change | Session token from old server is invalid | Expected — just log in with new server credentials |
 | Login window appears but login fails | Wrong server address | Check `client/.env`, verify with `curl` |
+| Login fails and server logs contain `readonly database` | Server DB permissions are incorrect | Fix DB ownership/permissions in `INSTALL_SERVER.md` (Step 5.1), then restart server |
 | `WS: reconnecting…` in status bar | WebSocket can't connect | Check port 8000 is open on server; check `.env` address |
 | Blank window / no widgets visible | Missing Qt system libs on Linux | Re-run Step 2 system dependencies |
 | `qt.qpa.plugin: could not load xcb` | Missing xcb libs on Linux | `sudo apt install -y libxcb-cursor0 libxcb-icccm4` |

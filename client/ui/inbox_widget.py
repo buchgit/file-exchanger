@@ -86,7 +86,7 @@ class InboxWidget(QWidget):
         self._table.horizontalHeader().setStretchLastSection(False)
         self._table.verticalHeader().setVisible(False)
         self._table.setAlternatingRowColors(True)
-        self._table.verticalHeader().setDefaultSectionSize(40)
+        self._table.verticalHeader().setDefaultSectionSize(48)
 
         # Bottom
         self._download_progress = QProgressBar()
@@ -130,7 +130,7 @@ class InboxWidget(QWidget):
 
     def _on_pending_error(self, code: int, detail: str) -> None:
         if code == 401:
-            self.request_logout.emit()
+            self._status_label.setText("Session expired. Re-login via File -> Log Out.")
         else:
             self._status_label.setText(f"Error: {detail}")
 
@@ -211,7 +211,9 @@ class InboxWidget(QWidget):
     def _on_download_error(self, code: int, detail: str) -> None:
         self._download_progress.setVisible(False)
         if code == 401:
-            self.request_logout.emit()
+            msg = "Session expired. Re-login via File -> Log Out."
+            self._status_label.setText(msg)
+            QMessageBox.warning(self, "Authorization", msg)
         else:
             level = QMessageBox.critical if code >= 500 else QMessageBox.warning
             level(self, "Download Error", f"Error {code}: {detail}" if code else detail)
@@ -246,7 +248,9 @@ class InboxWidget(QWidget):
 
     def _on_ack_error(self, code: int, detail: str) -> None:
         if code == 401:
-            self.request_logout.emit()
+            msg = "Session expired. Re-login via File -> Log Out."
+            self._status_label.setText(msg)
+            QMessageBox.warning(self, "Authorization", msg)
         else:
             level = QMessageBox.critical if code >= 500 else QMessageBox.warning
             level(self, "Ack Error", f"Error {code}: {detail}" if code else detail)

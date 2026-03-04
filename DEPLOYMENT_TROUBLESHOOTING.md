@@ -13,6 +13,7 @@
 5. [ModuleNotFoundError после обновления](#5-modulenotfounderror-после-обновления)
 6. [Database migration issues](#6-database-migration-issues)
 7. [Firewall: недоступен порт 8000](#7-firewall-недоступен-порт-8000)
+8. [SQLite: readonly database / unable to open database file](#8-sqlite-readonly-database--unable-to-open-database-file)
 
 ---
 
@@ -326,6 +327,61 @@ sudo iptables -L -n | grep 8000
 
 ---
 
+## 8. SQLite: readonly database / unable to open database file
+
+### Симптом
+```bash
+$ journalctl -u file-exchanger -n 30
+sqlite3.OperationalError: attempt to write a readonly database
+# или
+sqlite3.OperationalError: unable to open database file
+```
+
+### Причина
+У пользователя, под которым запущен systemd-сервис, нет прав записи:
+- в файл БД
+- в директорию с БД (для `-wal`/`-shm` файлов SQLite)
+
+### Диагностика
+```bash
+# 1) Проверить пользователя сервиса
+systemctl show -p User --value file-exchanger
+
+# 2) Проверить путь к БД (по умолчанию SQLite: ./file_exchanger.db)
+grep '^DATABASE_URL=' /opt/file-exchanger/server/.env
+
+# 3) Проверить права на каталог и файл БД
+ls -ld /opt/file-exchanger/server
+ls -l /opt/file-exchanger/server/file_exchanger.db
+```
+
+### Решение (дефолтный путь БД)
+```bash
+SERVICE_USER=$(systemctl show -p User --value file-exchanger)
+[ -z "$SERVICE_USER" ] && SERVICE_USER=www-data
+DB_PATH=/opt/file-exchanger/server/file_exchanger.db
+
+sudo touch "$DB_PATH"
+sudo chown "$SERVICE_USER:$SERVICE_USER" /opt/file-exchanger/server "$DB_PATH"
+sudo chmod 775 /opt/file-exchanger/server
+sudo chmod 660 "$DB_PATH"
+```
+
+### Проверка
+```bash
+SERVICE_USER=$(systemctl show -p User --value file-exchanger)
+[ -z "$SERVICE_USER" ] && SERVICE_USER=www-data
+DB_PATH=/opt/file-exchanger/server/file_exchanger.db
+
+sudo -u "$SERVICE_USER" test -w /opt/file-exchanger/server && echo "OK: server dir writable"
+sudo -u "$SERVICE_USER" test -w "$DB_PATH" && echo "OK: db file writable"
+sudo -u "$SERVICE_USER" /opt/file-exchanger/venv/bin/python -c "import sqlite3; db='$DB_PATH'; conn=sqlite3.connect(db); conn.execute('CREATE TABLE IF NOT EXISTS _perm_check (id INTEGER)'); conn.execute('DROP TABLE _perm_check'); conn.commit(); conn.close(); print('SQLite write check: OK')"
+```
+
+Если `DATABASE_URL` указывает на другой путь, примените те же `chown/chmod` к этому пути.
+
+---
+
 ## Быстрая диагностика: полный чеклист
 
 ```bash
@@ -350,8 +406,16 @@ sudo ufw status
 # 7. Проверка зависимостей
 /opt/file-exchanger/venv/bin/pip list | head -20
 
-# 8. Проверка БД
+# 8. Проверка пользователя сервиса
+systemctl show -p User --value file-exchanger
+
+# 9. Проверка БД
 ls -la /opt/file-exchanger/server/*.db
+
+# 10. Проверка прав записи БД (от пользователя сервиса)
+SERVICE_USER=$(systemctl show -p User --value file-exchanger); [ -z "$SERVICE_USER" ] && SERVICE_USER=www-data
+sudo -u "$SERVICE_USER" test -w /opt/file-exchanger/server && echo "server dir writable"
+sudo -u "$SERVICE_USER" test -w /opt/file-exchanger/server/file_exchanger.db && echo "db file writable"
 ```
 
 ---
@@ -368,6 +432,7 @@ ls -la /opt/file-exchanger/server/*.db
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-03-04 | Добавлена секция по правам SQLite БД (`readonly database`) |
 | 2026-03-04 | Добавлены решения для git pull проблем |
 | 2026-03-04 | Добавлена секция про dubious ownership |
 | 2026-03-04 | Добавлен полный чеклист диагностики |

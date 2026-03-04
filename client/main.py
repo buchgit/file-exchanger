@@ -164,12 +164,15 @@ def _resolve_user_info(api: ApiClient, token: str, user_info: dict) -> dict:
 
 def _show_main(app: QApplication, api: ApiClient, token: str, user_info: dict) -> None:
     win = MainWindow(token, user_info, api)
+    _keep_window_reference(app, win)
 
     def on_logout() -> None:
         win.hide()
         new_token, new_user = _do_login(api)
         if new_token is None:
-            app.quit()
+            # Do not terminate abruptly if re-login is canceled.
+            # Keep current window visible so the user can continue or retry.
+            win.show()
             return
         new_user = _resolve_user_info(api, new_token, new_user)
         config.save_session(
@@ -178,10 +181,27 @@ def _show_main(app: QApplication, api: ApiClient, token: str, user_info: dict) -
             new_user["username"],
             new_user["is_admin"],
         )
+        win.close()
         _show_main(app, api, new_token, new_user)
 
     win.logout_requested.connect(on_logout)
     win.show()
+
+
+def _keep_window_reference(app: QApplication, win: MainWindow) -> None:
+    # Prevent Python GC from destroying the top-level window unexpectedly.
+    windows = getattr(app, "_file_exchanger_windows", None)
+    if windows is None:
+        windows = []
+        setattr(app, "_file_exchanger_windows", windows)
+    windows.append(win)
+
+    def _drop_reference(_=None) -> None:
+        tracked = getattr(app, "_file_exchanger_windows", [])
+        if win in tracked:
+            tracked.remove(win)
+
+    win.destroyed.connect(_drop_reference)
 
 
 if __name__ == "__main__":

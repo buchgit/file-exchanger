@@ -69,6 +69,7 @@ class SendWidget(QWidget):
         self._current_user_id = current_user_id
         self._workers: list = []
         self._upload_workers: list[UploadWorker] = []
+        self._users_worker: ApiWorker | None = None
         self._selected_file: str | None = None
         self.setStyleSheet(GLASS_STYLEHEET)
 
@@ -184,22 +185,52 @@ class SendWidget(QWidget):
         return w
 
     def _load_users(self) -> None:
+        if self._users_worker is not None and self._users_worker.isRunning():
+            return
+
+        self._refresh_users_btn.setEnabled(False)
         w = self._run_worker(self._api.list_users, self._token)
+        self._users_worker = w
         w.result.connect(self._on_users_result)
         w.error.connect(self._on_users_error)
+        w.finished.connect(
+            lambda: self._refresh_users_btn.setEnabled(True)
+        )
+        w.finished.connect(
+            lambda: setattr(self, "_users_worker", None)
+            if self._users_worker is w else None
+        )
         w.start()
 
     def _on_users_result(self, users: list) -> None:
         self._receiver_combo.clear()
+        has_recipients = False
         for user in users:
             if user.id != self._current_user_id:
                 self._receiver_combo.addItem(user.username, userData=user.id)
+                has_recipients = True
+
+        if not has_recipients:
+            self._receiver_combo.addItem("No recipients available", userData=None)
+            self._status_label.setText("No recipients available for sending.")
+            return
+
+        self._status_label.setText("")
 
     def _on_users_error(self, code: int, detail: str) -> None:
+        self._receiver_combo.clear()
+        self._receiver_combo.addItem("Recipients unavailable", userData=None)
         if code == 401:
-            self.request_logout.emit()
+            self._status_label.setText(
+                "Session expired while loading recipients. Please log in again."
+            )
+        elif code == 403:
+            self._status_label.setText(
+                "Access to recipients list is denied."
+            )
         else:
-            self._status_label.setText(f"Failed to load users: {detail}")
+            msg = f"Error {code}: {detail}" if code else f"Network error: {detail}"
+            self._status_label.setText(f"Failed to load recipients: {msg}")
 
     # ------------------------------------------------------------------
     # Browse
@@ -289,7 +320,9 @@ class SendWidget(QWidget):
         self._progress.setVisible(False)
         self._set_enabled(True)
         if code == 401:
-            self.request_logout.emit()
+            msg = "Session expired. Re-login via File -> Log Out."
+            self._status_label.setText(msg)
+            QMessageBox.warning(self, "Authorization", msg)
         elif code >= 500:
             QMessageBox.critical(self, "Upload Error", f"Server error: {detail}")
         else:

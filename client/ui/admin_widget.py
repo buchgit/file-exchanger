@@ -51,7 +51,7 @@ class AdminWidget(QWidget):
         self._table.verticalHeader().setVisible(False)
         self._table.horizontalHeader().setStretchLastSection(False)
         self._table.setAlternatingRowColors(True)
-        self._table.verticalHeader().setDefaultSectionSize(40)
+        self._table.verticalHeader().setDefaultSectionSize(48)
         users_vbox.addWidget(self._table)
 
         refresh_btn = QPushButton("⟳ Refresh")
@@ -118,7 +118,11 @@ class AdminWidget(QWidget):
 
     def _on_users_error(self, code: int, detail: str) -> None:
         if code == 401:
-            self.request_logout.emit()
+            QMessageBox.warning(
+                self,
+                "Authorization",
+                "Session expired. Re-login via File -> Log Out.",
+            )
         else:
             QMessageBox.warning(self, "Error", f"Failed to load users: {detail}")
 
@@ -164,7 +168,11 @@ class AdminWidget(QWidget):
 
     def _on_delete_error(self, code: int, detail: str) -> None:
         if code == 401:
-            self.request_logout.emit()
+            QMessageBox.warning(
+                self,
+                "Authorization",
+                "Session expired. Re-login via File -> Log Out.",
+            )
         elif code >= 500:
             QMessageBox.critical(self, "Delete Error", f"Server error: {detail}")
         else:
@@ -202,7 +210,12 @@ class AdminWidget(QWidget):
     def _on_create_error(self, code: int, detail: str) -> None:
         self._create_btn.setEnabled(True)
         if code == 401:
-            self.request_logout.emit()
+            self._create_status.setText("Session expired. Re-login via File -> Log Out.")
+            QMessageBox.warning(
+                self,
+                "Authorization",
+                "Session expired. Re-login via File -> Log Out.",
+            )
         elif code == 409:
             QMessageBox.warning(self, "Conflict", detail)
         elif code >= 500:

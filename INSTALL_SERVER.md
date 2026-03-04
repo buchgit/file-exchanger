@@ -100,6 +100,39 @@ chown -R www-data:www-data /opt/file-exchanger
 chmod -R 750 /opt/file-exchanger
 ```
 
+### Step 5.1 - Verify and set database permissions (SQLite)
+
+By default, the server uses SQLite at:
+`/opt/file-exchanger/server/file_exchanger.db`
+
+The default service user is `www-data` (from `server/file-exchanger.service`).
+SQLite requires write access to both:
+- the database file (`file_exchanger.db`)
+- the directory containing it (`server/`) for `-wal`/`-shm` files
+
+Check the service user and current permissions:
+```bash
+grep '^User=' /opt/file-exchanger/server/file-exchanger.service
+ls -ld /opt/file-exchanger/server
+ls -l /opt/file-exchanger/server/file_exchanger.db
+```
+
+Create/fix permissions:
+```bash
+touch /opt/file-exchanger/server/file_exchanger.db
+chown www-data:www-data /opt/file-exchanger/server
+chown www-data:www-data /opt/file-exchanger/server/file_exchanger.db
+chmod 775 /opt/file-exchanger/server
+chmod 660 /opt/file-exchanger/server/file_exchanger.db
+```
+
+Optional write test as service user:
+```bash
+sudo -u www-data /opt/file-exchanger/venv/bin/python -c "import sqlite3; db='/opt/file-exchanger/server/file_exchanger.db'; conn=sqlite3.connect(db); conn.execute('CREATE TABLE IF NOT EXISTS _perm_check (id INTEGER)'); conn.execute('DROP TABLE _perm_check'); conn.commit(); conn.close(); print('SQLite write check: OK')"
+```
+
+If you changed `DATABASE_URL` in `.env`, apply the same ownership/permissions to that custom path.
+
 ## Step 6 — Configure environment (optional)
 
 Create `/opt/file-exchanger/server/.env` to override defaults:
@@ -203,5 +236,7 @@ ufw delete allow 8000/tcp
 | `Unit file-exchanger.service could not be found` | Service file not copied | `cp /opt/file-exchanger/server/file-exchanger.service /etc/systemd/system/ && systemctl daemon-reload` |
 | `uvicorn: command not found` in service logs | pip install incomplete | `/opt/file-exchanger/venv/bin/pip install uvicorn[standard]` then `systemctl restart file-exchanger` |
 | 403 on file operations | Storage dir wrong owner | `chown -R www-data:www-data /opt/file-exchanger/server/storage` |
+| `sqlite3.OperationalError: attempt to write a readonly database` | DB file or DB directory is not writable by service user | `chown www-data:www-data /opt/file-exchanger/server /opt/file-exchanger/server/file_exchanger.db && chmod 775 /opt/file-exchanger/server && chmod 660 /opt/file-exchanger/server/file_exchanger.db` |
+| `sqlite3.OperationalError: unable to open database file` | Wrong DB path or missing permissions on DB directory | Verify `DATABASE_URL` and ensure service user can write DB directory |
 | Can't connect from internet | Firewall or cloud provider blocking | `ufw allow 8000/tcp && ufw --force enable` and check cloud provider security groups |
 | pip WARNING about yanked anyio | Known packaging issue | Safe to ignore — installation still succeeds |
