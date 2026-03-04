@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 
 from auth import (
     create_access_token,
@@ -13,6 +14,25 @@ from database import get_db
 from models import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+def _db_error_to_detail(exc: SQLAlchemyError) -> str:
+    message = str(getattr(exc, "orig", exc))
+    lower = message.lower()
+    if "readonly" in lower:
+        return (
+            "Database is read-only. Check write permissions for file_exchanger.db "
+            "and its parent directory."
+        )
+    if "database is locked" in lower:
+        return (
+            "Database is locked. Stop duplicate server processes and restart service."
+        )
+    if "no such table" in lower or "no such column" in lower:
+        return (
+            "Database schema is outdated. Run DB migration/recreate database."
+        )
+    return f"Database error: {message}"
 
 
 class Token(BaseModel):
@@ -58,4 +78,11 @@ def change_password(
         )
     current_user.password_hash = hash_password(body.new_password)
     current_user.force_change_password = False
-    db.commit()
+    try:
+        db.commit()
+    except SQLAlchemyError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_db_error_to_detail(exc),
+        )
