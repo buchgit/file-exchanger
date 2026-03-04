@@ -47,11 +47,11 @@ class LoginDialog(QDialog):
         # Title
         title = QLabel("🔐 File Exchanger")
         title.setObjectName("titleLabel")
-        title.setAlignment(Qt.AlignCenter)
-        
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         subtitle = QLabel("Sign in to your account")
         subtitle.setObjectName("subtitleLabel")
-        subtitle.setAlignment(Qt.AlignCenter)
+        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self._username_edit = QLineEdit()
         self._username_edit.setPlaceholderText("Enter your username")
@@ -59,7 +59,9 @@ class LoginDialog(QDialog):
         self._password_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self._password_edit.setPlaceholderText("Enter your password")
 
-        self._login_btn = QPushButton("Log In")
+        self._login_btn = QPushButton("Sign In")
+        self._login_btn.setObjectName("primaryBtn")
+        self._login_btn.setFixedWidth(200)
         self._login_btn.setDefault(True)
         self._login_btn.clicked.connect(self._on_login_clicked)
         self._username_edit.returnPressed.connect(self._on_login_clicked)
@@ -68,7 +70,7 @@ class LoginDialog(QDialog):
         self._status_label = QLabel("")
         self._status_label.setStyleSheet("color: #ff6b6b; font-size: 13px;")
         self._status_label.setWordWrap(True)
-        self._status_label.setAlignment(Qt.AlignCenter)
+        self._status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         vbox.addWidget(title)
         vbox.addWidget(subtitle)
@@ -78,7 +80,7 @@ class LoginDialog(QDialog):
         vbox.addWidget(QLabel("Password:"))
         vbox.addWidget(self._password_edit)
         vbox.addSpacing(10)
-        vbox.addWidget(self._login_btn)
+        vbox.addWidget(self._login_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
         vbox.addWidget(self._status_label)
         vbox.addStretch()
         return page
@@ -92,12 +94,12 @@ class LoginDialog(QDialog):
         # Title
         title = QLabel("🔑 Change Password")
         title.setObjectName("titleLabel")
-        title.setAlignment(Qt.AlignCenter)
-        
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         info = QLabel("Your password must be changed before continuing.")
         info.setObjectName("subtitleLabel")
         info.setWordWrap(True)
-        info.setAlignment(Qt.AlignCenter)
+        info.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         form_layout = QVBoxLayout()
         form_layout.setSpacing(12)
@@ -122,19 +124,21 @@ class LoginDialog(QDialog):
         form_layout.addWidget(self._confirm_password_edit)
 
         self._change_btn = QPushButton("Change Password")
+        self._change_btn.setObjectName("primaryBtn")
+        self._change_btn.setFixedWidth(200)
         self._change_btn.clicked.connect(self._on_change_clicked)
         self._confirm_password_edit.returnPressed.connect(self._on_change_clicked)
 
         self._pw_status_label = QLabel("")
         self._pw_status_label.setStyleSheet("color: #ff6b6b; font-size: 13px;")
         self._pw_status_label.setWordWrap(True)
-        self._pw_status_label.setAlignment(Qt.AlignCenter)
+        self._pw_status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         vbox.addWidget(title)
         vbox.addWidget(info)
         vbox.addSpacing(10)
         vbox.addLayout(form_layout)
-        vbox.addWidget(self._change_btn)
+        vbox.addWidget(self._change_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
         vbox.addWidget(self._pw_status_label)
         vbox.addStretch()
         return page

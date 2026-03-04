@@ -67,9 +67,10 @@ class InboxWidget(QWidget):
     def _build_ui(self) -> None:
         # Top bar
         top = QHBoxLayout()
-        title = QLabel("📥 Inbox — Pending Files")
-        title.setStyleSheet("font-size: 18px; font-weight: 600;")
+        title = QLabel("📥 Inbox")
+        title.setObjectName("sectionTitle")
         self._refresh_btn = QPushButton("⟳ Refresh")
+        self._refresh_btn.setObjectName("ghostBtn")
         self._refresh_btn.clicked.connect(self._refresh)
         top.addWidget(title)
         top.addStretch()
@@ -84,6 +85,8 @@ class InboxWidget(QWidget):
         self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self._table.horizontalHeader().setStretchLastSection(False)
         self._table.verticalHeader().setVisible(False)
+        self._table.setAlternatingRowColors(True)
+        self._table.verticalHeader().setDefaultSectionSize(40)
 
         # Bottom
         self._download_progress = QProgressBar()
@@ -146,7 +149,9 @@ class InboxWidget(QWidget):
         self._table.setItem(row, self.COL_RECEIVED, QTableWidgetItem(f.created_at[:19]))
 
         # Download button
-        dl_btn = QPushButton("Download")
+        dl_btn = QPushButton("↓ Download")
+        dl_btn.setObjectName("ghostBtn")
+        dl_btn.setFixedWidth(100)
         dl_btn.clicked.connect(
             lambda checked, fid=f.id, pn=f.part_number, fn=f.original_filename:
                 self._on_download_clicked(fid, pn, fn)
@@ -154,7 +159,9 @@ class InboxWidget(QWidget):
         self._table.setCellWidget(row, self.COL_DOWNLOAD, dl_btn)
 
         # Ack button
-        ack_btn = QPushButton("Acknowledge")
+        ack_btn = QPushButton("✓ Ack")
+        ack_btn.setObjectName("accentBtn")
+        ack_btn.setFixedWidth(72)
         ack_btn.clicked.connect(
             lambda checked, fid=f.id, r=row: self._on_ack_clicked(fid, r)
         )

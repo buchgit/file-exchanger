@@ -50,11 +50,14 @@ class AdminWidget(QWidget):
         self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self._table.verticalHeader().setVisible(False)
         self._table.horizontalHeader().setStretchLastSection(False)
+        self._table.setAlternatingRowColors(True)
+        self._table.verticalHeader().setDefaultSectionSize(40)
         users_vbox.addWidget(self._table)
 
-        refresh_btn = QPushButton("⟳ Refresh Users")
+        refresh_btn = QPushButton("⟳ Refresh")
+        refresh_btn.setObjectName("ghostBtn")
         refresh_btn.clicked.connect(self._refresh_users)
-        users_vbox.addWidget(refresh_btn)
+        users_vbox.addWidget(refresh_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         layout.addWidget(users_group)
 
@@ -75,6 +78,8 @@ class AdminWidget(QWidget):
         create_form.addRow("", self._is_admin_check)
 
         self._create_btn = QPushButton("✨ Create User")
+        self._create_btn.setObjectName("primaryBtn")
+        self._create_btn.setFixedWidth(160)
         self._create_btn.clicked.connect(self._on_create_clicked)
         self._create_status = QLabel("")
         self._create_status.setObjectName("statusLabel")
@@ -128,6 +133,8 @@ class AdminWidget(QWidget):
         self._table.setItem(row, self.COL_CREATED, QTableWidgetItem(user.created_at[:19]))
 
         del_btn = QPushButton("Delete")
+        del_btn.setObjectName("dangerBtn")
+        del_btn.setFixedWidth(72)
         if user.id == self._current_user_id:
             del_btn.setEnabled(False)
         else:

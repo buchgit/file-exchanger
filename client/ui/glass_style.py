@@ -1,147 +1,218 @@
 """
-Glassmorphism stylesheet for File Exchanger
-Modern frosted-glass UI with vibrant gradients and depth effects
+Forge UI stylesheet for File Exchanger
+Dark navy / charcoal with electric teal accent — compact, sharp, professional
 """
 
-# Color palette
-GLASS_PRIMARY = "rgba(255, 255, 255, 0.1)"
-GLASS_SECONDARY = "rgba(255, 255, 255, 0.05)"
-GLASS_BORDER = "rgba(255, 255, 255, 0.2)"
-GLASS_HOVER = "rgba(255, 255, 255, 0.15)"
-GLASS_PRESSED = "rgba(255, 255, 255, 0.2)"
+# ── Palette ────────────────────────────────────────────────────────────────
+BG_APP      = "#0C1018"
+BG_SURFACE  = "#141B26"
+BG_CARD     = "#1B2540"
+BG_INPUT    = "#090D15"
 
-TEXT_PRIMARY = "#FFFFFF"
-TEXT_SECONDARY = "rgba(255, 255, 255, 0.7)"
-TEXT_MUTED = "rgba(255, 255, 255, 0.5)"
+BORDER      = "#28374A"
+BORDER_LT   = "#3A5070"
 
-ACCENT_GRADIENT = "qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #667eea, stop:1 #764ba2)"
-BG_GRADIENT = "qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #0f0c29, stop:0.5 #302b63, stop:1 #24243e)"
-CARD_GRADIENT = "qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 rgba(255,255,255,0.1), stop:1 rgba(255,255,255,0.05))"
+ACCENT      = "#2ECBAB"
+ACCENT_HV   = "#3FDFBF"
+ACCENT_DIM  = "rgba(46, 203, 171, 0.12)"
+ACCENT_RING = "rgba(46, 203, 171, 0.40)"
 
-BUTTON_GRADIENT = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2)"
-BUTTON_HOVER = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #7c8eee, stop:1 #8b5cbf)"
+SUCCESS     = "#22C55E"
+DANGER      = "#E84C3D"
+DANGER_DIM  = "rgba(232, 76, 61, 0.12)"
+WARNING     = "#F59E0B"
 
-SUCCESS_GRADIENT = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #11998e, stop:1 #38ef7d)"
-DANGER_GRADIENT = "qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eb3349, stop:1 #f45c43)"
+TEXT        = "#DCE6F0"
+TEXT2       = "#7A8FA8"
+TEXT_MUTED  = "#4A5C6D"
 
 GLASS_STYLEHEET = f"""
-/* ============================================
-   GLOBAL STYLES
-   ============================================ */
+/* ═══════════════════════════════════════════
+   GLOBAL
+   ═══════════════════════════════════════════ */
 
 QWidget {{
     background: transparent;
-    color: {TEXT_PRIMARY};
-    font-family: 'Segoe UI', 'SF Pro Display', -apple-system, sans-serif;
-    font-size: 14px;
+    color: {TEXT};
+    font-family: 'Segoe UI', 'SF Pro Text', -apple-system, sans-serif;
+    font-size: 13px;
 }}
 
-/* ============================================
-   MAIN WINDOW & DIALOGS
-   ============================================ */
+/* ═══════════════════════════════════════════
+   WINDOWS / DIALOGS
+   ═══════════════════════════════════════════ */
 
 QMainWindow {{
-    background: {BG_GRADIENT};
+    background: {BG_APP};
 }}
 
 QDialog {{
-    background: {BG_GRADIENT};
+    background: {BG_SURFACE};
 }}
 
-/* ============================================
-   GLASS CARD / CONTAINER
-   ============================================ */
+/* ═══════════════════════════════════════════
+   GROUP BOX  (card containers)
+   ═══════════════════════════════════════════ */
 
 QGroupBox {{
-    background: {CARD_GRADIENT};
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 16px;
-    margin-top: 20px;
-    padding-top: 16px;
-    font-weight: 600;
-    font-size: 15px;
+    background: {BG_SURFACE};
+    border: 1px solid {BORDER};
+    border-radius: 10px;
+    margin-top: 22px;
+    padding-top: 10px;
+    font-size: 13px;
+    color: {TEXT};
 }}
 
 QGroupBox::title {{
     subcontrol-origin: margin;
     subcontrol-position: top left;
-    left: 20px;
-    top: 8px;
-    padding: 0 12px;
-    color: {TEXT_PRIMARY};
-    background: {BUTTON_GRADIENT};
-    border-radius: 8px;
+    left: 14px;
+    top: 6px;
+    padding: 2px 10px;
+    color: {ACCENT};
+    background: transparent;
+    border: none;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
 }}
 
-/* ============================================
-   BUTTONS
-   ============================================ */
+/* ═══════════════════════════════════════════
+   BUTTONS  —  compact by default
+   ═══════════════════════════════════════════ */
 
 QPushButton {{
-    background: {BUTTON_GRADIENT};
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 12px;
-    padding: 12px 24px;
+    background: {BG_CARD};
+    border: 1px solid {BORDER};
+    border-radius: 6px;
+    padding: 6px 16px;
     font-weight: 600;
-    font-size: 14px;
-    color: {TEXT_PRIMARY};
-    min-height: 20px;
+    font-size: 13px;
+    color: {TEXT};
 }}
 
 QPushButton:hover {{
-    background: {BUTTON_HOVER};
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: #243350;
+    border-color: {ACCENT};
+    color: {ACCENT};
 }}
 
 QPushButton:pressed {{
-    background: {GLASS_PRESSED};
-    padding: 13px 23px 11px 25px;
+    background: {BG_SURFACE};
+    border-color: #27B99A;
 }}
 
 QPushButton:disabled {{
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: {BG_SURFACE};
+    border-color: {BG_CARD};
     color: {TEXT_MUTED};
 }}
 
-/* Small icon buttons */
-QPushButton#refreshBtn, QPushButton#smallBtn {{
-    min-width: 28px;
-    max-width: 28px;
-    min-height: 28px;
-    max-height: 28px;
-    padding: 0;
+/* Primary CTA */
+QPushButton#primaryBtn {{
+    background: {ACCENT};
+    border-color: {ACCENT};
+    color: {BG_APP};
+    font-weight: 700;
+    font-size: 14px;
+    padding: 8px 24px;
     border-radius: 8px;
 }}
 
-/* Table buttons */
+QPushButton#primaryBtn:hover {{
+    background: {ACCENT_HV};
+    border-color: {ACCENT_HV};
+    color: {BG_APP};
+}}
+
+QPushButton#primaryBtn:pressed {{
+    background: #27B99A;
+}}
+
+QPushButton#primaryBtn:disabled {{
+    background: #1B3530;
+    border-color: #1B3530;
+    color: #4A7A6D;
+}}
+
+/* Danger */
+QPushButton#dangerBtn {{
+    background: transparent;
+    border-color: {DANGER};
+    color: {DANGER};
+    font-weight: 600;
+}}
+
+QPushButton#dangerBtn:hover {{
+    background: {DANGER_DIM};
+    border-color: #FF6B5A;
+    color: #FF6B5A;
+}}
+
+QPushButton#dangerBtn:disabled {{
+    border-color: #4A2C28;
+    color: #4A2C28;
+}}
+
+/* Ghost / secondary */
+QPushButton#ghostBtn {{
+    background: transparent;
+    border-color: {BORDER};
+    color: {TEXT2};
+    font-weight: 500;
+}}
+
+QPushButton#ghostBtn:hover {{
+    background: {BG_CARD};
+    color: {TEXT};
+    border-color: {BORDER_LT};
+}}
+
+/* Accent outline */
+QPushButton#accentBtn {{
+    background: {ACCENT_DIM};
+    border-color: {ACCENT_RING};
+    color: {ACCENT};
+    font-weight: 600;
+}}
+
+QPushButton#accentBtn:hover {{
+    background: rgba(46, 203, 171, 0.20);
+    border-color: {ACCENT};
+}}
+
+/* Table cell buttons — tighter padding */
 QTableWidget QPushButton {{
-    padding: 8px 16px;
-    font-size: 13px;
-    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 5px;
+    margin: 3px 4px;
 }}
 
-/* ============================================
-   INPUT FIELDS
-   ============================================ */
+/* ═══════════════════════════════════════════
+   INPUTS
+   ═══════════════════════════════════════════ */
 
 QLineEdit {{
-    background: {GLASS_PRIMARY};
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 14px;
-    color: {TEXT_PRIMARY};
-    selection-background-color: #667eea;
+    background: {BG_INPUT};
+    border: 1px solid {BORDER};
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: {TEXT};
+    selection-background-color: {ACCENT};
+    selection-color: {BG_APP};
 }}
 
 QLineEdit:focus {{
-    border: 1px solid rgba(102, 126, 234, 0.5);
-    background: {GLASS_HOVER};
+    border-color: {ACCENT};
+    background: #0A1020;
 }}
 
 QLineEdit:disabled {{
-    background: {GLASS_SECONDARY};
+    background: {BG_SURFACE};
     color: {TEXT_MUTED};
 }}
 
@@ -149,211 +220,401 @@ QLineEdit::placeholder {{
     color: {TEXT_MUTED};
 }}
 
-/* ============================================
-   TEXT EDIT / TEXTAREA
-   ============================================ */
-
 QTextEdit {{
-    background: {GLASS_PRIMARY};
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 14px;
-    color: {TEXT_PRIMARY};
-    selection-background-color: #667eea;
+    background: {BG_INPUT};
+    border: 1px solid {BORDER};
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: {TEXT};
+    selection-background-color: {ACCENT};
+    selection-color: {BG_APP};
 }}
 
 QTextEdit:focus {{
-    border: 1px solid rgba(102, 126, 234, 0.5);
-    background: {GLASS_HOVER};
+    border-color: {ACCENT};
 }}
 
 QTextEdit:disabled {{
-    background: {GLASS_SECONDARY};
+    background: {BG_SURFACE};
     color: {TEXT_MUTED};
 }}
 
-/* ============================================
+/* ═══════════════════════════════════════════
    COMBOBOX
-   ============================================ */
+   ═══════════════════════════════════════════ */
 
 QComboBox {{
-    background: {GLASS_PRIMARY};
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 14px;
-    color: {TEXT_PRIMARY};
+    background: {BG_INPUT};
+    border: 1px solid {BORDER};
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: {TEXT};
 }}
 
 QComboBox:hover {{
-    background: {GLASS_HOVER};
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-color: {BORDER_LT};
 }}
 
 QComboBox:focus {{
-    border: 1px solid rgba(102, 126, 234, 0.5);
-    background: {GLASS_HOVER};
+    border-color: {ACCENT};
 }}
 
 QComboBox::drop-down {{
     border: none;
-    width: 30px;
+    width: 26px;
 }}
 
 QComboBox::down-arrow {{
     image: none;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid {TEXT_PRIMARY};
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid {TEXT2};
     margin-right: 10px;
 }}
 
 QComboBox QAbstractItemView {{
-    background: rgba(30, 30, 50, 0.95);
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 12px;
-    padding: 8px;
-    selection-background-color: #667eea;
-    selection-color: {TEXT_PRIMARY};
+    background: {BG_CARD};
+    border: 1px solid {BORDER};
+    border-radius: 8px;
+    padding: 6px;
+    selection-background-color: {ACCENT};
+    selection-color: {BG_APP};
     outline: none;
+    color: {TEXT};
 }}
 
 QComboBox QAbstractItemView::item {{
-    min-height: 40px;
-    padding: 8px 12px;
-    border-radius: 8px;
+    min-height: 34px;
+    padding: 5px 10px;
+    border-radius: 5px;
     margin: 2px 0;
 }}
 
 QComboBox QAbstractItemView::item:hover {{
-    background: rgba(102, 126, 234, 0.3);
+    background: {ACCENT_DIM};
 }}
 
 QComboBox QAbstractItemView::item:selected {{
-    background: #667eea;
-    color: {TEXT_PRIMARY};
+    background: {ACCENT};
+    color: {BG_APP};
 }}
 
-/* ============================================
+/* ═══════════════════════════════════════════
    SPINBOX
-   ============================================ */
+   ═══════════════════════════════════════════ */
 
 QSpinBox {{
-    background: {GLASS_PRIMARY};
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 12px;
-    padding: 10px 16px;
-    font-size: 14px;
-    color: {TEXT_PRIMARY};
+    background: {BG_INPUT};
+    border: 1px solid {BORDER};
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: {TEXT};
 }}
 
 QSpinBox:focus {{
-    border: 1px solid rgba(102, 126, 234, 0.5);
-    background: {GLASS_HOVER};
+    border-color: {ACCENT};
 }}
 
 QSpinBox::up-button, QSpinBox::down-button {{
     border: none;
-    background: {GLASS_HOVER};
-    width: 24px;
-    border-radius: 6px;
+    background: {BG_SURFACE};
+    width: 20px;
+    border-radius: 4px;
     margin: 2px;
 }}
 
 QSpinBox::up-button:hover, QSpinBox::down-button:hover {{
-    background: {GLASS_HOVER};
+    background: {BG_CARD};
 }}
 
 QSpinBox::up-arrow {{
     image: none;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 6px solid {TEXT_PRIMARY};
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 5px solid {TEXT2};
 }}
 
 QSpinBox::down-arrow {{
     image: none;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid {TEXT_PRIMARY};
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid {TEXT2};
 }}
 
-/* ============================================
+/* ═══════════════════════════════════════════
    TABLES
-   ============================================ */
+   ═══════════════════════════════════════════ */
 
 QTableWidget {{
-    background: {GLASS_PRIMARY};
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 16px;
-    gridline-color: rgba(255, 255, 255, 0.1);
-    selection-background-color: rgba(102, 126, 234, 0.3);
-    selection-color: {TEXT_PRIMARY};
+    background: {BG_INPUT};
+    border: 1px solid {BORDER};
+    border-radius: 10px;
+    gridline-color: {BG_CARD};
+    selection-background-color: {ACCENT_DIM};
+    selection-color: {TEXT};
     outline: none;
+    font-size: 13px;
+    alternate-background-color: #0E1622;
 }}
 
 QTableWidget::item {{
-    padding: 10px;
-    border-radius: 8px;
+    padding: 8px 12px;
+    border: none;
 }}
 
 QTableWidget::item:hover {{
-    background: rgba(255, 255, 255, 0.05);
+    background: {BG_SURFACE};
 }}
 
 QTableWidget::item:selected {{
-    background: rgba(102, 126, 234, 0.4);
+    background: {ACCENT_DIM};
 }}
 
 QHeaderView::section {{
-    background: {BUTTON_GRADIENT};
-    color: {TEXT_PRIMARY};
-    padding: 12px 16px;
+    background: {BG_SURFACE};
+    color: {TEXT2};
+    padding: 10px 12px;
     border: none;
-    border-bottom: 1px solid {GLASS_BORDER};
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    font-weight: 600;
-    font-size: 13px;
+    border-bottom: 1px solid {BORDER};
+    border-right: 1px solid {BG_CARD};
+    font-weight: 700;
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
 }}
 
 QHeaderView::section:first {{
-    border-top-left-radius: 16px;
+    border-top-left-radius: 10px;
 }}
 
 QHeaderView::section:last {{
-    border-top-right-radius: 16px;
+    border-top-right-radius: 10px;
     border-right: none;
 }}
 
 QHeaderView::section:hover {{
-    background: {BUTTON_HOVER};
+    background: {BG_CARD};
+    color: {TEXT};
 }}
 
 QTableCornerButton::section {{
-    background: {BUTTON_GRADIENT};
+    background: {BG_SURFACE};
     border: none;
-    border-bottom: 1px solid {GLASS_BORDER};
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid {BORDER};
 }}
+
+/* ═══════════════════════════════════════════
+   TABS
+   ═══════════════════════════════════════════ */
+
+QTabWidget::pane {{
+    background: {BG_SURFACE};
+    border: 1px solid {BORDER};
+    border-radius: 10px;
+    top: -1px;
+}}
+
+QTabBar::tab {{
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 9px 20px;
+    margin-right: 2px;
+    font-weight: 500;
+    font-size: 13px;
+    color: {TEXT2};
+}}
+
+QTabBar::tab:hover {{
+    background: {BG_SURFACE};
+    color: {TEXT};
+}}
+
+QTabBar::tab:selected {{
+    background: {BG_SURFACE};
+    color: {ACCENT};
+    border-color: {BORDER};
+    border-bottom: 1px solid {BG_SURFACE};
+    font-weight: 600;
+}}
+
+QTabBar::tab:!selected {{
+    margin-top: 4px;
+}}
+
+/* ═══════════════════════════════════════════
+   PROGRESS BAR
+   ═══════════════════════════════════════════ */
+
+QProgressBar {{
+    background: {BG_INPUT};
+    border: 1px solid {BORDER};
+    border-radius: 6px;
+    text-align: center;
+    height: 14px;
+    color: {TEXT};
+    font-weight: 600;
+    font-size: 11px;
+}}
+
+QProgressBar::chunk {{
+    background: {ACCENT};
+    border-radius: 4px;
+}}
+
+/* ═══════════════════════════════════════════
+   CHECKBOX
+   ═══════════════════════════════════════════ */
+
+QCheckBox {{
+    color: {TEXT};
+    spacing: 8px;
+    font-size: 13px;
+}}
+
+QCheckBox::indicator {{
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: {BG_INPUT};
+    border: 1px solid {BORDER};
+}}
+
+QCheckBox::indicator:hover {{
+    border-color: {ACCENT};
+}}
+
+QCheckBox::indicator:checked {{
+    background: {ACCENT};
+    border-color: {ACCENT};
+}}
+
+/* ═══════════════════════════════════════════
+   LABELS
+   ═══════════════════════════════════════════ */
+
+QLabel {{
+    color: {TEXT};
+    background: transparent;
+}}
+
+QLabel#titleLabel {{
+    font-size: 22px;
+    font-weight: 700;
+    color: {ACCENT};
+    letter-spacing: -0.3px;
+}}
+
+QLabel#subtitleLabel {{
+    font-size: 13px;
+    color: {TEXT2};
+}}
+
+QLabel#statusLabel {{
+    font-size: 12px;
+    color: {TEXT2};
+}}
+
+QLabel#sectionTitle {{
+    font-size: 16px;
+    font-weight: 700;
+    color: {TEXT};
+}}
+
+/* ═══════════════════════════════════════════
+   STATUS BAR
+   ═══════════════════════════════════════════ */
+
+QStatusBar {{
+    background: {BG_SURFACE};
+    border-top: 1px solid {BORDER};
+    color: {TEXT2};
+    font-size: 12px;
+}}
+
+QStatusBar::item {{
+    border: none;
+}}
+
+/* ═══════════════════════════════════════════
+   MENU BAR
+   ═══════════════════════════════════════════ */
+
+QMenuBar {{
+    background: {BG_SURFACE};
+    border-bottom: 1px solid {BORDER};
+    padding: 2px 0;
+}}
+
+QMenuBar::item {{
+    padding: 6px 14px;
+    border-radius: 6px;
+    margin: 2px 4px;
+    background: transparent;
+    color: {TEXT2};
+    font-size: 13px;
+}}
+
+QMenuBar::item:selected {{
+    background: {BG_CARD};
+    color: {TEXT};
+}}
+
+QMenuBar::item:pressed {{
+    background: #243350;
+    color: {ACCENT};
+}}
+
+QMenu {{
+    background: {BG_CARD};
+    border: 1px solid {BORDER};
+    border-radius: 10px;
+    padding: 6px;
+}}
+
+QMenu::item {{
+    padding: 8px 16px;
+    border-radius: 6px;
+    margin: 1px 0;
+    color: {TEXT};
+    font-size: 13px;
+}}
+
+QMenu::item:selected {{
+    background: {ACCENT_DIM};
+    color: {ACCENT};
+}}
+
+QMenu::separator {{
+    height: 1px;
+    background: {BORDER};
+    margin: 4px 8px;
+}}
+
+/* ═══════════════════════════════════════════
+   SCROLLBARS
+   ═══════════════════════════════════════════ */
 
 QScrollBar:vertical {{
     background: transparent;
-    width: 10px;
-    border-radius: 5px;
+    width: 8px;
+    border-radius: 4px;
     margin: 0;
 }}
 
 QScrollBar::handle:vertical {{
-    background: {GLASS_BORDER};
-    border-radius: 5px;
-    min-height: 30px;
+    background: {BORDER};
+    border-radius: 4px;
+    min-height: 24px;
 }}
 
 QScrollBar::handle:vertical:hover {{
-    background: rgba(255, 255, 255, 0.3);
+    background: {BORDER_LT};
 }}
 
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
@@ -362,201 +623,27 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
 
 QScrollBar:horizontal {{
     background: transparent;
-    height: 10px;
-    border-radius: 5px;
-    margin: 0;
+    height: 8px;
+    border-radius: 4px;
 }}
 
 QScrollBar::handle:horizontal {{
-    background: {GLASS_BORDER};
-    border-radius: 5px;
-    min-width: 30px;
+    background: {BORDER};
+    border-radius: 4px;
+    min-width: 24px;
 }}
 
 QScrollBar::handle:horizontal:hover {{
-    background: rgba(255, 255, 255, 0.3);
+    background: {BORDER_LT};
 }}
 
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
     width: 0;
 }}
 
-/* ============================================
-   TABS
-   ============================================ */
-
-QTabWidget::pane {{
-    background: {GLASS_PRIMARY};
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 16px;
-    padding: 0;
-}}
-
-QTabBar::tab {{
-    background: {GLASS_SECONDARY};
-    border: 1px solid {GLASS_BORDER};
-    border-bottom: none;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    padding: 12px 24px;
-    margin-right: 4px;
-    font-weight: 500;
-    color: {TEXT_SECONDARY};
-}}
-
-QTabBar::tab:hover {{
-    background: {GLASS_HOVER};
-}}
-
-QTabBar::tab:selected {{
-    background: {BUTTON_GRADIENT};
-    color: {TEXT_PRIMARY};
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}}
-
-QTabBar::tab:!selected {{
-    margin-top: 8px;
-}}
-
-/* ============================================
-   PROGRESS BAR
-   ============================================ */
-
-QProgressBar {{
-    background: {GLASS_SECONDARY};
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 12px;
-    text-align: center;
-    height: 20px;
-    color: {TEXT_PRIMARY};
-    font-weight: 600;
-    font-size: 12px;
-}}
-
-QProgressBar::chunk {{
-    background: {BUTTON_GRADIENT};
-    border-radius: 10px;
-}}
-
-/* ============================================
-   CHECKBOX
-   ============================================ */
-
-QCheckBox {{
-    color: {TEXT_PRIMARY};
-    spacing: 10px;
-    font-size: 14px;
-}}
-
-QCheckBox::indicator {{
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    background: {GLASS_PRIMARY};
-    border: 1px solid {GLASS_BORDER};
-}}
-
-QCheckBox::indicator:hover {{
-    border: 1px solid rgba(102, 126, 234, 0.5);
-    background: {GLASS_HOVER};
-}}
-
-QCheckBox::indicator:checked {{
-    background: {BUTTON_GRADIENT};
-    border: 1px solid rgba(102, 126, 234, 0.8);
-}}
-
-/* ============================================
-   LABELS
-   ============================================ */
-
-QLabel {{
-    color: {TEXT_PRIMARY};
-    background: transparent;
-}}
-
-QLabel#titleLabel {{
-    font-size: 24px;
-    font-weight: 700;
-    color: {TEXT_PRIMARY};
-}}
-
-QLabel#subtitleLabel {{
-    font-size: 14px;
-    color: {TEXT_SECONDARY};
-}}
-
-QLabel#statusLabel {{
-    font-size: 13px;
-    color: {TEXT_MUTED};
-}}
-
-/* ============================================
-   STATUS BAR
-   ============================================ */
-
-QStatusBar {{
-    background: {GLASS_PRIMARY};
-    border-top: 1px solid {GLASS_BORDER};
-    color: {TEXT_SECONDARY};
-    font-size: 13px;
-}}
-
-QStatusBar::item {{
-    border: none;
-}}
-
-/* ============================================
-   MENU BAR
-   ============================================ */
-
-QMenuBar {{
-    background: {GLASS_PRIMARY};
-    border-bottom: 1px solid {GLASS_BORDER};
-    padding: 4px 0;
-}}
-
-QMenuBar::item {{
-    padding: 8px 16px;
-    border-radius: 8px;
-    margin: 0 4px;
-    background: transparent;
-}}
-
-QMenuBar::item:selected {{
-    background: {GLASS_HOVER};
-}}
-
-QMenuBar::item:pressed {{
-    background: {GLASS_PRESSED};
-}}
-
-QMenu {{
-    background: rgba(30, 30, 50, 0.98);
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 12px;
-    padding: 8px;
-}}
-
-QMenu::item {{
-    padding: 10px 20px;
-    border-radius: 8px;
-    margin: 2px 0;
-}}
-
-QMenu::item:selected {{
-    background: {GLASS_HOVER};
-}}
-
-QMenu::separator {{
-    height: 1px;
-    background: {GLASS_BORDER};
-    margin: 6px 10px;
-}}
-
-/* ============================================
-   SCROLL AREA
-   ============================================ */
+/* ═══════════════════════════════════════════
+   MISC
+   ═══════════════════════════════════════════ */
 
 QScrollArea {{
     background: transparent;
@@ -567,32 +654,24 @@ QScrollArea > QWidget > QWidget {{
     background: transparent;
 }}
 
-/* ============================================
-   TOOLTIP
-   ============================================ */
-
 QToolTip {{
-    background: rgba(30, 30, 50, 0.95);
-    border: 1px solid {GLASS_BORDER};
-    border-radius: 8px;
-    padding: 8px 12px;
-    color: {TEXT_PRIMARY};
-    font-size: 13px;
+    background: {BG_CARD};
+    border: 1px solid {BORDER};
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: {TEXT};
+    font-size: 12px;
 }}
 
-/* ============================================
-   MESSAGE BOX
-   ============================================ */
-
 QMessageBox {{
-    background: {BG_GRADIENT};
+    background: {BG_SURFACE};
 }}
 
 QMessageBox QLabel {{
-    color: {TEXT_PRIMARY};
+    color: {TEXT};
 }}
 
 QMessageBox QPushButton {{
-    min-width: 100px;
+    min-width: 80px;
 }}
 """

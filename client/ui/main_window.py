@@ -61,7 +61,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self._tabs)
 
         # Status bar
-        self._ws_status_label = QLabel("WS: connecting…")
+        self._ws_status_label = QLabel("● connecting…")
+        self._ws_status_label.setStyleSheet("color: #F59E0B; font-size: 12px;")
         status_bar = QStatusBar()
         status_bar.addPermanentWidget(self._ws_status_label)
         self.setStatusBar(status_bar)
@@ -88,10 +89,22 @@ class MainWindow(QMainWindow):
     def _start_ws(self) -> None:
         self._ws = WsThread(self._token)
         self._ws.new_file.connect(self._on_new_file)
-        self._ws.connected.connect(lambda: self._ws_status_label.setText("WS: connected"))
-        self._ws.disconnected.connect(lambda: self._ws_status_label.setText("WS: reconnecting…"))
-        self._ws.error.connect(lambda msg: self._ws_status_label.setText(f"WS: {msg[:60]}"))
+        self._ws.connected.connect(self._on_ws_connected)
+        self._ws.disconnected.connect(self._on_ws_disconnected)
+        self._ws.error.connect(self._on_ws_error)
         self._ws.start()
+
+    def _on_ws_connected(self) -> None:
+        self._ws_status_label.setText("● connected")
+        self._ws_status_label.setStyleSheet("color: #22C55E; font-size: 12px;")
+
+    def _on_ws_disconnected(self) -> None:
+        self._ws_status_label.setText("● reconnecting…")
+        self._ws_status_label.setStyleSheet("color: #F59E0B; font-size: 12px;")
+
+    def _on_ws_error(self, msg: str) -> None:
+        self._ws_status_label.setText(f"● {msg[:50]}")
+        self._ws_status_label.setStyleSheet("color: #E84C3D; font-size: 12px;")
 
     def _stop_ws(self) -> None:
         if self._ws is not None:
@@ -160,7 +173,7 @@ class _ChangePasswordDialog(QDialog):
         # Title
         title = QLabel("🔑 Change Password")
         title.setObjectName("titleLabel")
-        title.setAlignment(Qt.AlignCenter)
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         form = QFormLayout()
         form.setSpacing(12)
@@ -178,6 +191,8 @@ class _ChangePasswordDialog(QDialog):
         form.addRow("Confirm:", self._confirm)
 
         self._btn = QPushButton("Change Password")
+        self._btn.setObjectName("primaryBtn")
+        self._btn.setFixedWidth(200)
         self._btn.clicked.connect(self._on_change)
         self._status = QLabel("")
         self._status.setObjectName("statusLabel")
@@ -186,6 +201,7 @@ class _ChangePasswordDialog(QDialog):
         btn_row = QHBoxLayout()
         btn_row.addStretch()
         btn_row.addWidget(self._btn)
+        btn_row.addStretch()
 
         vbox = QVBoxLayout(self)
         vbox.setContentsMargins(30, 30, 30, 30)

@@ -86,7 +86,7 @@ class SendWidget(QWidget):
 
         # Title
         title = QLabel("📤 Send File")
-        title.setStyleSheet("font-size: 18px; font-weight: 600;")
+        title.setObjectName("sectionTitle")
         layout.addWidget(title)
 
         # To: combobox + refresh
@@ -107,6 +107,8 @@ class SendWidget(QWidget):
         self._file_edit.setReadOnly(True)
         self._file_edit.setPlaceholderText("No file selected")
         self._browse_btn = QPushButton("📁 Browse")
+        self._browse_btn.setObjectName("ghostBtn")
+        self._browse_btn.setFixedWidth(100)
         self._browse_btn.clicked.connect(self._on_browse)
         file_row = QWidget(self)
         file_layout = QHBoxLayout(file_row)
@@ -140,6 +142,8 @@ class SendWidget(QWidget):
 
         # Send button + progress + status
         self._send_btn = QPushButton("📤 Send File")
+        self._send_btn.setObjectName("primaryBtn")
+        self._send_btn.setFixedWidth(180)
         self._send_btn.clicked.connect(self._on_send)
         self._progress = QProgressBar()
         self._progress.setVisible(False)
@@ -156,7 +160,7 @@ class SendWidget(QWidget):
         layout.addWidget(part_row)
         layout.addWidget(QLabel("Comment:"))
         layout.addWidget(self._comment_edit)
-        layout.addWidget(self._send_btn)
+        layout.addWidget(self._send_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
         layout.addWidget(self._progress)
         layout.addWidget(self._file_size_label)
         layout.addWidget(self._status_label)
